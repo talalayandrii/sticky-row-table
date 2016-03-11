@@ -1,10 +1,8 @@
 var gulp = require('gulp');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
+var uglify = require('gulp-uglifyjs');
 
 gulp.task('default', function () {
   gulp.src('src/sticky-row-table.js')
-    .pipe(concat('sticky-row-table.min.js'))
-    .pipe(uglify())
+    .pipe(uglify('sticky-row-table.min.js'))
     .pipe(gulp.dest('./build/'));
 });

@@ -106,12 +106,14 @@
       .on("resize", $.proxy(this.calculateDimensions, this));
 
     this.calculateDimensions();
-    this.redraw();
+    this.redraw(true);
   }
 
   StickyRowTable.prototype = {
     /**
      * Sets sticky rows
+     *
+     * @private
      */
     setRowSets: function () {
       var self = this;
@@ -145,8 +147,9 @@
      * Handling by scroll event (see constructor)
      *
      * @lockable
+     * @param isForceRedraw
      */
-    redraw: function () {
+    redraw: function (isForceRedraw) {
       if (!this._lock.lock()) {
         return;
       }
@@ -156,7 +159,7 @@
 
       var containerScroll = this.container.$element.getScroll();
 
-      if (containerScroll.top != this.container.scroll.top) {
+      if (containerScroll.top != this.container.scroll.top || isForceRedraw) {
         this.scroll.vertical = containerScroll.top > this.container.scroll.top ? "down" : "up";
         this.container.scroll.top = containerScroll.top;
 
@@ -205,7 +208,9 @@
 
         stickyTable.attr('class', this.table.$element.attr('class')).css({
           'position': 'fixed',
-          'background': '#C6C6D6',
+          'z-index': 1,
+          'overflow': 'hidden',
+          'background': '#fff',
           'display': 'none',
           'top': this.container.offset.top,
           'left': this.table.offset.left + this.container.scroll.left,
@@ -265,6 +270,12 @@
 
       $.each(stickyRows, function (i, row) {
         self.stickyTable.$element.append(self.getCloneOfRow(row.row));
+      });
+
+      this.stickyTable.$element.css({
+        'top': this.container.offset.top,
+        'left': this.table.offset.left + this.container.scroll.left,
+        'width': this.table.$element.width()
       });
 
       if (this.stickyTable.$element.is(':hidden')) {
